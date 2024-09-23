@@ -1,4 +1,4 @@
-import LlamaAI from "npm:llamaai";
+//import LlamaAI from "npm:llamaai";
 
 console.log("Hello from the Callback Function!");
 
@@ -15,7 +15,7 @@ Deno.serve(async (req) => {
     console.log(body);
 
     const apiToken = Deno.env.get("LLAMA_API_KEY");
-    const llamaAPI = new LlamaAI(apiToken);
+    //const llamaAPI = new LlamaAI(apiToken);
 
     return new Response(JSON.stringify({ message: "success" }), {
       status: 500,
