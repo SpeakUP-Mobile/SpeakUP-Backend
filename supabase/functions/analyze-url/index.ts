@@ -24,6 +24,7 @@ Deno.serve(async (req) => {
         { status: 500 },
       );
     }
+    console.log(callbackUrl);
 
     const humeResponse = await fetch(
       "https://api.hume.ai/v0/batch/jobs",
