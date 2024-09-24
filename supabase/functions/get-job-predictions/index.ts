@@ -11,13 +11,15 @@ Deno.serve(async (req) => {
       );
     }
 
-    const body = await JSON.stringify(req.json(), null, 2);
+    const body = await req.json();
     console.log(body);
+
+    const formattedJson = JSON.stringify(body, null, 2);
 
     type OutputChunk = { response?: string };
 
     const output = await session.run(
-      body +
+      formattedJson +
         "Take this file and read the emotions in it. This is the result of an interview. I want you to take the data from this interview's emotions and tell the user what to improve and what they exceled in.",
       { stream: true },
     ) as AsyncIterable<OutputChunk>;
