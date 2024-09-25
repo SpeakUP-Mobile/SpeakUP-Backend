@@ -74,14 +74,34 @@ Deno.serve(async (req) => {
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
-        let combinedResponse = ""; // Store combined chunks here
+        let combinedResponse = "";
 
         try {
           for await (const chunk of output) {
-            combinedResponse += chunk.response ?? ""; // Append each chunk to the combined string
+            combinedResponse += chunk.response ?? "";
           }
-          console.log(combinedResponse); // Print the combined result at the end
-
+          console.log(combinedResponse);
+          const outputBlob = new Blob([combinedResponse], {
+            type: "text/plain",
+          });
+          const outputName = `${body.job_id}.txt`;
+          console.log(
+            `Saving ${outputName} to ${match[1]}/llama-output/${outputName}`,
+          );
+          const { error } = await supabase.storage.from("users").upload(
+            `${match[1]}/llama-output/${outputName}`,
+            outputBlob,
+          );
+          if (error) {
+            console.error("Error uploading file:", error);
+            return new Response(
+              JSON.stringify({
+                error: "File upload failed",
+                details: error.message,
+              }),
+              { status: 500 },
+            );
+          }
           controller.enqueue(encoder.encode(combinedResponse)); // Send the combined response to the client
         } catch (err) {
           console.error("Stream error:", err);
