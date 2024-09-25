@@ -1,6 +1,6 @@
+console.log("Hello from the Callback Function!");
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const session = new Supabase.ai.Session("llama3.1");
-console.log("Hello from the Callback Function!");
 
 Deno.serve(async (req) => {
   try {
@@ -20,7 +20,7 @@ Deno.serve(async (req) => {
 
     const output = await session.run(
       formattedJson +
-        "Take this file and read the emotions in it. This is the result of an interview. I want you to take the data from this interview's emotions and tell the user what to improve and what they exceled in.",
+        "Take this file and read the emotions in it. This is the result of an interview. I want you to take the data from this interview's emotions and tell the user what to improve and what they exceled in. It should be a short paragraph that just contains tips. Keep in mind that lower values indicate LESS of that emotion, and higher values indicate MORE of that emotion. Do not indicate actual values or emotions in the paragraph. Do not add interjections, make it somewhat formal.",
       { stream: true },
     ) as AsyncIterable<OutputChunk>;
 
@@ -32,12 +32,15 @@ Deno.serve(async (req) => {
     const stream = new ReadableStream({
       async start(controller) {
         const encoder = new TextEncoder();
+        let combinedResponse = ""; // Store combined chunks here
 
         try {
           for await (const chunk of output) {
-            console.log(chunk.response);
-            controller.enqueue(encoder.encode(chunk.response ?? ""));
+            combinedResponse += chunk.response ?? ""; // Append each chunk to the combined string
           }
+          console.log(combinedResponse); // Print the combined result at the end
+
+          controller.enqueue(encoder.encode(combinedResponse)); // Send the combined response to the client
         } catch (err) {
           console.error("Stream error:", err);
         } finally {
