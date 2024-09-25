@@ -1,15 +1,33 @@
-console.log("Hello from the Callback Function!");
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
-const session = new Supabase.ai.Session("llama3.1");
 
-// add to .env file
-const supabase = createClient(
-  "https://omotzypqzerrcymfovba.supabase.co/",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tb3R6eXBxemVycmN5bWZvdmJhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNTEzNjk2MiwiZXhwIjoyMDQwNzEyOTYyfQ.TCX8fX_56B2fjd1jLqLh_T01Q04gBsmN9fppbniwqkY", // Second key in supabase api dashboard if u need to test
-);
+const SESSION = new Supabase.ai.Session("llama3.1");
+const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get("SUBASE_SERVICE_ROLE_KEY");
+const SUPABASE_URL = Deno.env.get("SUBASE_URL");
+
+console.log("Hello from the Callback Function!");
 
 Deno.serve(async (req) => {
+  if (!SUPABASE_URL) {
+    return new Response(
+      JSON.stringify({ error: "SUPABASE_URL not found in environment" }),
+      { status: 500 },
+    );
+  }
+  if (!SUPABASE_SERVICE_ROLE_KEY) {
+    return new Response(
+      JSON.stringify({
+        error: "SUPABASE_SERVICE_ROLE_KEY not found in environment",
+      }),
+      { status: 500 },
+    );
+  }
+
+  const supabase = createClient(
+    SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY,
+  );
+
   try {
     if (req.method !== "POST") {
       return new Response(
@@ -22,12 +40,14 @@ Deno.serve(async (req) => {
     console.log(body);
 
     const formattedJson = JSON.stringify(body, null);
-    console.log(formattedJson);
     const fileBlob = new Blob([formattedJson], { type: "application/json" });
     const fileName = `${body.job_id}.json`;
 
+    const url = body.predictions[0].source.url;
+    const match = url.match(/\/users\/([a-f0-9\-]+)/);
+    console.log(`Saving ${fileName} to ${match[1]}/analyzed-json/${fileName}`);
     const { error } = await supabase.storage.from("users").upload(
-      fileName,
+      `${match[1]}/analyzed-json/${fileName}`,
       fileBlob,
     );
     if (error) {
@@ -40,7 +60,7 @@ Deno.serve(async (req) => {
 
     type OutputChunk = { response?: string };
 
-    const output = await session.run(
+    const output = await SESSION.run(
       formattedJson +
         "Take this file and read the emotions in it. This is the result of an interview. I want you to take the data from this interview's emotions and tell the user what to improve and what they exceled in. It should be a short paragraph that just contains tips. Keep in mind that lower values indicate LESS of that emotion, and higher values indicate MORE of that emotion. Do not indicate actual values or emotions in the paragraph. Do not add interjections, make it somewhat formal.",
       { stream: true },
