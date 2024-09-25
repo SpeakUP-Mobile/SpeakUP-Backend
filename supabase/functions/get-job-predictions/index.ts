@@ -5,8 +5,8 @@ const session = new Supabase.ai.Session("llama3.1");
 
 // add to .env file
 const supabase = createClient(
-  "SUPABASE-URL",
-  "SUPABASE-SERVICE-ROLE-KEY", // Second key in supabase api dashboard if u need to test
+  "https://omotzypqzerrcymfovba.supabase.co/",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9tb3R6eXBxemVycmN5bWZvdmJhIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcyNTEzNjk2MiwiZXhwIjoyMDQwNzEyOTYyfQ.TCX8fX_56B2fjd1jLqLh_T01Q04gBsmN9fppbniwqkY", // Second key in supabase api dashboard if u need to test
 );
 
 Deno.serve(async (req) => {
@@ -24,7 +24,7 @@ Deno.serve(async (req) => {
     const formattedJson = JSON.stringify(body, null);
     console.log(formattedJson);
     const fileBlob = new Blob([formattedJson], { type: "application/json" });
-    const fileName = `uploaded-file-${Date.now()}.json`;
+    const fileName = `${body.job_id}.json`;
 
     const { error } = await supabase.storage.from("users").upload(
       fileName,

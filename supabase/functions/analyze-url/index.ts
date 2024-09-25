@@ -54,6 +54,7 @@ Deno.serve(async (req) => {
     }
 
     const responseData = await humeResponse.json();
+    console.log(responseData.job_id);
     return new Response(JSON.stringify({ success: true, data: responseData }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
