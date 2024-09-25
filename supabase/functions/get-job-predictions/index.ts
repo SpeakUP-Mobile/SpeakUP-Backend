@@ -1,6 +1,13 @@
 console.log("Hello from the Callback Function!");
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.4";
 const session = new Supabase.ai.Session("llama3.1");
+
+// add to .env file
+const supabase = createClient(
+  "SUPABASE-URL",
+  "SUPABASE-SERVICE-ROLE-KEY", // Second key in supabase api dashboard if u need to test
+);
 
 Deno.serve(async (req) => {
   try {
@@ -14,7 +21,22 @@ Deno.serve(async (req) => {
     const body = await req.json();
     console.log(body);
 
-    const formattedJson = JSON.stringify(body, null, 2);
+    const formattedJson = JSON.stringify(body, null);
+    console.log(formattedJson);
+    const fileBlob = new Blob([formattedJson], { type: "application/json" });
+    const fileName = `uploaded-file-${Date.now()}.json`;
+
+    const { error } = await supabase.storage.from("users").upload(
+      fileName,
+      fileBlob,
+    );
+    if (error) {
+      console.error("Error uploading file:", error);
+      return new Response(
+        JSON.stringify({ error: "File upload failed", details: error.message }),
+        { status: 500 },
+      );
+    }
 
     type OutputChunk = { response?: string };
 
