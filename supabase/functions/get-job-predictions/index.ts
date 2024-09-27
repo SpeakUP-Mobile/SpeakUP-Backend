@@ -58,6 +58,8 @@ Deno.serve(async (req) => {
       );
     }
 
+    console.log(Deno.env.get("AI_INFERENCE_API_HOST"));
+
     type OutputChunk = { response?: string };
 
     const output = await SESSION.run(
