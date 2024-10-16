@@ -64,7 +64,7 @@ Deno.serve(async (req) => {
 
     const output = await SESSION.run(
       formattedJson +
-        "Take this file and read the emotions in it. This is the result of an interview. I want you to take the data from this interview's emotions and tell the user what to improve and what they exceled in. It should be a short paragraph that just contains tips. Keep in mind that lower values indicate LESS of that emotion, and higher values indicate MORE of that emotion. Do not indicate actual values or emotions in the paragraph. Do not add interjections, make it somewhat formal.",
+        "DO NOT ADD NEWLINE CHARACTERS, IT SHOULD BE ONE PARAGRAPH. Also, please do not say aything before your analysis, like 'Based off your file...' etc. Take this file and read the emotions in it. This is the result of an interview. I want you to take the data from this interview's emotions and tell the user what to improve and what they exceled in. It should be a short paragraph that just contains tips. Keep in mind that lower values indicate LESS of that emotion, and higher values indicate MORE of that emotion. Do not indicate actual values or emotions in the paragraph. Do not add interjections, make it somewhat formal.",
       { stream: true },
     ) as AsyncIterable<OutputChunk>;
 
