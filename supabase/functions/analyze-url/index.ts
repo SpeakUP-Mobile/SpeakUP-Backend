@@ -37,6 +37,7 @@ Deno.serve(async (req) => {
         body: JSON.stringify({
           urls: [videoUrl],
           models: { face: {}, burst: {}, language: {}, prosody: {} },
+          transcription: { language: "en" },
           callback_url: callbackUrl,
         }),
       },
