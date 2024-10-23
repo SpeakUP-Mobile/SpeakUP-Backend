@@ -181,7 +181,7 @@ If you do not have a high certainty that question is being answered, please tell
 
 I want you to analyze the transcript and the JSON data and provide feedback on maintaining a serious tone. Infer different emotions as professional and unprofessional, and then give recommendations.
 
-Make it very concise. Do not include markdown elements, ONLY plaintext. Keep it to about a short 2-4 sentence paragraph.  No list with -, * etc, just sentences. Do not include newlines. Do not include characters not on a standard keyboard. Make sure the advice is specific to the transcript and json data. Remember, do not give suggestions for the questions. We need suggestions for the person answering. Also, do not say "the transcript says" Just say what the interviewee can improve.
+Make it very concise. Do not include markdown elements, ONLY plaintext. Keep it to about a short 2-4 sentence paragraph.  No list with -, * etc, just sentences. Do not include newlines. Do not include characters not on a standard keyboard. Make sure the advice is specific to the transcript and json data. Remember, do not give suggestions for the questions. We need suggestions for the person answering. Also, do not say "the transcript says" Just say what the interviewee can improve. Keep in mind, if the user says specific examples and has a good interview, to not give advice that the user already did. Be harsh, but complement the user if they answer has good parts.
               `,
       { stream: true },
     ) as AsyncIterable<OutputChunk>;
